@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/filipecsoares/api-go-gin/database"
 	"github.com/filipecsoares/api-go-gin/models"
 	"github.com/filipecsoares/api-go-gin/routes"
 )
 
 func main() {
+	database.ConnectDataBase()
 	models.Students = []models.Student{
 		{Name: "Filipe", Id: 1, Email: "filipe@email.com"},
 		{Name: "Tumo", Id: 2, Email: "tumo@email.com"},
