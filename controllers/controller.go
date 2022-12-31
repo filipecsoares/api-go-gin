@@ -9,7 +9,9 @@ import (
 )
 
 func GetAllStudents(c *gin.Context) {
-	c.JSON(http.StatusOK, models.Students)
+	var students []models.Student
+	database.DB.Find(&students)
+	c.JSON(http.StatusOK, students)
 }
 
 func CreateStudent(c *gin.Context) {
