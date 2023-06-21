@@ -7,6 +7,7 @@ import (
 
 func HandleRequests() {
 	r := gin.Default()
+	r.GET("/healthcheck", controllers.HealthCheck)
 	r.GET("/students", controllers.GetAllStudents)
 	r.GET("/students/:id", controllers.GetStudentById)
 	r.GET("/students/email/:email", controllers.GetStudentByEmail)

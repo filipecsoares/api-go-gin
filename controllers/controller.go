@@ -8,6 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func HealthCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "OK",
+	})
+}
+
 func GetAllStudents(c *gin.Context) {
 	var students []models.Student
 	database.DB.Find(&students)
