@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/filipecsoares/api-go-gin/controllers"
+	"github.com/filipecsoares/api-go-gin/database"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,4 +25,13 @@ func TestStatusCodeHealthCheck(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.Code)
 	responseMock := `{"message":"OK"}`
 	assert.Equal(t, responseMock, response.Body.String())
+}
+
+func TestListAllStudents(t *testing.T) {
+	database.ConnectDataBase()
+	r := SetupTestRoutes()
+	req, _ := http.NewRequest("GET", "/students", nil)
+	response := httptest.NewRecorder()
+	r.ServeHTTP(response, req)
+	assert.Equal(t, http.StatusOK, response.Code)
 }
