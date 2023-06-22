@@ -7,6 +7,7 @@ import (
 
 	"github.com/filipecsoares/api-go-gin/controllers"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func SetupTestRoutes() *gin.Engine {
@@ -20,7 +21,7 @@ func TestStatusCodeHealthCheck(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/healthcheck", nil)
 	response := httptest.NewRecorder()
 	r.ServeHTTP(response, req)
-	if response.Code != http.StatusOK {
-		t.Errorf("Expected status code 200, got %v", response.Code)
-	}
+	assert.Equal(t, http.StatusOK, response.Code)
+	responseMock := `{"message":"OK"}`
+	assert.Equal(t, responseMock, response.Body.String())
 }
