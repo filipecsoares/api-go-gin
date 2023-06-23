@@ -15,8 +15,11 @@ import (
 var ID uint
 
 func SetupTestRoutes() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	routes := gin.Default()
 	routes.GET("/healthcheck", controllers.HealthCheck)
+	routes.GET("/students", controllers.GetAllStudents)
+	routes.GET("/students/email/:email", controllers.GetStudentByEmail)
 	return routes
 }
 
@@ -50,6 +53,17 @@ func TestListAllStudents(t *testing.T) {
 	defer DeleteStudentMock()
 	r := SetupTestRoutes()
 	req, _ := http.NewRequest("GET", "/students", nil)
+	response := httptest.NewRecorder()
+	r.ServeHTTP(response, req)
+	assert.Equal(t, http.StatusOK, response.Code)
+}
+
+func TestGetStudentByEmail(t *testing.T) {
+	database.ConnectDataBase()
+	CreateStudentMock()
+	defer DeleteStudentMock()
+	r := SetupTestRoutes()
+	req, _ := http.NewRequest("GET", "/students/email/test@test.com", nil)
 	response := httptest.NewRecorder()
 	r.ServeHTTP(response, req)
 	assert.Equal(t, http.StatusOK, response.Code)
