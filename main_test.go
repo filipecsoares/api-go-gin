@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,6 +25,7 @@ func SetupTestRoutes() *gin.Engine {
 	routes.GET("/students/:id", controllers.GetStudentById)
 	routes.GET("/students/email/:email", controllers.GetStudentByEmail)
 	routes.DELETE("/students/:id", controllers.DeleteStudent)
+	routes.PATCH("/students/:id", controllers.EditStudent)
 	return routes
 }
 
@@ -98,5 +100,27 @@ func TestDeleteStudent(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", path, nil)
 	response := httptest.NewRecorder()
 	r.ServeHTTP(response, req)
+	assert.Equal(t, http.StatusOK, response.Code)
+}
+
+func TestEditStudent(t *testing.T) {
+	database.ConnectDataBase()
+	CreateStudentMock()
+	defer DeleteStudentMock()
+	r := SetupTestRoutes()
+	studentNewData := models.Student{
+		Name:  "Test2",
+		Email: "test2@test.com",
+	}
+	jsonStudent, _ := json.Marshal(studentNewData)
+	path := fmt.Sprintf("/students/%d", ID)
+	req, _ := http.NewRequest("PATCH", path, bytes.NewBuffer(jsonStudent))
+	response := httptest.NewRecorder()
+	r.ServeHTTP(response, req)
+	var student models.Student
+	json.Unmarshal(response.Body.Bytes(), &student)
+	assert.Equal(t, ID, student.ID)
+	assert.Equal(t, "Test2", student.Name)
+	assert.Equal(t, "test2@test.com", student.Email)
 	assert.Equal(t, http.StatusOK, response.Code)
 }
