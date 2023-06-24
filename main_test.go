@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,6 +21,7 @@ func SetupTestRoutes() *gin.Engine {
 	routes := gin.Default()
 	routes.GET("/healthcheck", controllers.HealthCheck)
 	routes.GET("/students", controllers.GetAllStudents)
+	routes.GET("/students/:id", controllers.GetStudentById)
 	routes.GET("/students/email/:email", controllers.GetStudentByEmail)
 	return routes
 }
@@ -66,5 +69,22 @@ func TestGetStudentByEmail(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/students/email/test@test.com", nil)
 	response := httptest.NewRecorder()
 	r.ServeHTTP(response, req)
+	assert.Equal(t, http.StatusOK, response.Code)
+}
+
+func TestGetStudentById(t *testing.T) {
+	database.ConnectDataBase()
+	CreateStudentMock()
+	defer DeleteStudentMock()
+	r := SetupTestRoutes()
+	path := fmt.Sprintf("/students/%d", ID)
+	req, _ := http.NewRequest("GET", path, nil)
+	response := httptest.NewRecorder()
+	r.ServeHTTP(response, req)
+	var student models.Student
+	json.Unmarshal(response.Body.Bytes(), &student)
+	assert.Equal(t, ID, student.ID)
+	assert.Equal(t, "Test", student.Name)
+	assert.Equal(t, "test@test.com", student.Email)
 	assert.Equal(t, http.StatusOK, response.Code)
 }
