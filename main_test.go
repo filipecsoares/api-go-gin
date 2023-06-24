@@ -23,6 +23,7 @@ func SetupTestRoutes() *gin.Engine {
 	routes.GET("/students", controllers.GetAllStudents)
 	routes.GET("/students/:id", controllers.GetStudentById)
 	routes.GET("/students/email/:email", controllers.GetStudentByEmail)
+	routes.DELETE("/students/:id", controllers.DeleteStudent)
 	return routes
 }
 
@@ -86,5 +87,16 @@ func TestGetStudentById(t *testing.T) {
 	assert.Equal(t, ID, student.ID)
 	assert.Equal(t, "Test", student.Name)
 	assert.Equal(t, "test@test.com", student.Email)
+	assert.Equal(t, http.StatusOK, response.Code)
+}
+
+func TestDeleteStudent(t *testing.T) {
+	database.ConnectDataBase()
+	CreateStudentMock()
+	r := SetupTestRoutes()
+	path := fmt.Sprintf("/students/%d", ID)
+	req, _ := http.NewRequest("DELETE", path, nil)
+	response := httptest.NewRecorder()
+	r.ServeHTTP(response, req)
 	assert.Equal(t, http.StatusOK, response.Code)
 }
