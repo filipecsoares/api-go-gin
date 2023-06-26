@@ -92,3 +92,19 @@ func EditStudent(c *gin.Context) {
 	database.DB.Model(&student).UpdateColumns(student)
 	c.JSON(http.StatusOK, student)
 }
+
+func ShowIndexPage(c *gin.Context) {
+	var students []models.Student
+	database.DB.Find(&students)
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"title":    "Index Page",
+		"students": students,
+	})
+}
+
+func NotFoundPage(c *gin.Context) {
+	c.HTML(http.StatusNotFound, "404.html", gin.H{
+		"title":   "Page not found",
+		"message": "The page you are looking for does not exist.",
+	})
+}
